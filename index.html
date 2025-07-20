@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unlimited Theme</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
+  <style>
+    :root {
+      --primary: #0ea5e9;
+      --secondary: #8b5cf6;
+      --accent: #ec4899;
+      --bg: #0f172a;
+      --text: #e2e8f0;
+      --card: #1e293b;
+      --border: #334155;
+    }
+
+    .glass {
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.125);
+    }
+
+    .glow {
+      box-shadow: 0 0 20px 5px currentColor;
+    }
+
+    .theme-card {
+      transition: all 0.3s ease;
+      cursor: grab;
+    }
+
+    .theme-card:active {
+      cursor: grabbing;
+    }
+
+    .theme-card:hover {
+      transform: translateY(-8px);
+    }
+
+    .palette {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+    }
+
+    .color-pill {
+      height: 24px;
+      border-radius: 12px;
+      transition: transform 0.2s;
+    }
+
+    .color-pill:hover {
+      transform: scale(1.2);
+    }
+
+    .slider-container {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    .slider-track {
+      display: flex;
+      transition: transform 0.5s ease;
+    }
+
+    .slider-item {
+      min-width: 100%;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: var(--secondary);
+    }
+
+    .theme-preview {
+      width: 100%;
+      height: 120px;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .theme-preview::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent));
+      opacity: 0.8;
+    }
+
+    .theme-preview::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 30%, white 2px, transparent 2px),
+                  radial-gradient(circle at 70% 70%, white 1px, transparent 1px),
+                  radial-gradient(circle at 50% 50%, white 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    .floating-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .floating-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .modal {
+      backdrop-filter: blur(10px);
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .hue-rotate {
+      animation: hue-rotate 5s linear infinite;
+    }
+
+    @keyframes hue-rotate {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+
+    .text-gradient {
+      background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .grid-pattern {
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+  </style>
+</head>
+<body class="min-h-screen transition-colors duration-500 custom-scrollbar" style="background: var(--bg); color: var(--text);">
+  <!-- Header -->
+  <header class="glass sticky top-0 z-50 px-4 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <h1 class="text-2xl font-bold text-gradient">Unlimited Theme</h1>
+      <button onclick="openModal()" class="px-4 py-2 bg-gradient-to-r from-sky-500 to-purple-500 rounded-lg hover:from-sky-600 hover:to-purple-600 transition-all">
+        Create Theme
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Hero Section -->
+    <section class="text-center mb-12">
+      <h2 class="text-5xl font-bold mb-4 text-gradient">Endless Possibilities</h2>
+      <p class="text-xl opacity-80">Craft, customize, and share unlimited themes</p>
+      <div class="mt-8 flex justify-center gap-4">
+        <button onclick="randomTheme()" class="px-6 py-3 bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg hover:from-pink-600 hover:to-rose-600 transition-all">
+          Random Theme
+        </button>
+        <button onclick="exportThemes()" class="px-6 py-3 border border-gray-600 rounded-lg hover:bg-gray-800 transition-all">
+          Export All
+        </button>
+      </div>
+    </section>
+
+    <!-- Theme Gallery -->
+    <section class="mb-12">
+      <h3 class="text-2xl font-semibold mb-6">Your Themes</h3>
+      <div id="themeGallery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Themes will be populated here -->
+      </div>
+    </section>
+
+    <!-- Color Palette Generator -->
+    <section class="mb-12">
+      <h3 class="text-2xl font-semibold mb-6">Color Palettes</h3>
+      <div id="paletteContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Palettes will be populated here -->
+      </div>
+    </section>
+
+    <!-- Theme Slider -->
+    <section class="mb-12">
+      <h3 class="text-2xl font-semibold mb-6">Theme Showcase</h3>
+      <div class="slider-container">
+        <div id="sliderTrack" class="slider-track">
+          <!-- Slider items will be populated here -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Create Theme Modal -->
+  <div id="themeModal" class="fixed inset-0 modal hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-gray-800 rounded-xl p-6 w-full max-w-md">
+        <h3 class="text-xl font-semibold mb-4">Create New Theme</h3>
+        <form id="themeForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-2">Theme Name</label>
+            <input type="text" id="themeName" class="w-full px-3 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500" required>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-2">Primary</label>
+              <input type="color" id="primary" value="#0ea5e9" class="w-full h-10 rounded cursor-pointer">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Secondary</label>
+              <input type="color" id="secondary" value="#8b5cf6" class="w-full h-10 rounded cursor-pointer">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Accent</label>
+              <input type="color" id="accent" value="#ec4899" class="w-full h-10 rounded cursor-pointer">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Background</label>
+              <input type="color" id="bg" value="#0f172a" class="w-full h-10 rounded cursor-pointer">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Text</label>
+              <input type="color" id="text" value="#e2e8f0" class="w-full h-10 rounded cursor-pointer">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Card</label>
+              <input type="color" id="card" value="#1e293b" class="w-full h-10 rounded cursor-pointer">
+            </div>
+          </div>
+          <div class="flex justify-end gap-2">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 border border-gray-600 rounded-lg hover:bg-gray-700">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-sky-500 rounded-lg hover:bg-sky-600">Create</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Action Button -->
+  <button onclick="scrollToTop()" class="floating-btn w-12 h-12 bg-gradient-to-r from-sky-500 to-purple-500 rounded-full flex items-center justify-center">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+    </svg>
+  </button>
+
+  <script>
+    // State management
+    let themes = JSON.parse(localStorage.getItem('themes')) || [];
+    let currentTheme = null;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      renderThemes();
+      generatePalettes();
+      setupSlider();
+      setupThemeForm();
+      createParticles();
+    });
+
+    // Render themes
+    function renderThemes() {
+      const gallery = document.getElementById('themeGallery');
+      gallery.innerHTML = themes.length ? themes.map(createThemeCard).join('') : 
+        '<p class="col-span-full text-center opacity-60">No themes yet. Create your first theme!</p>';
+    }
+
+    // Create theme card
+    function createThemeCard(theme, index) {
+      return `
+        <div class="theme-card glass rounded-xl p-4" data-index="${index}">
+          <div class="theme-preview mb-4" style="--primary: ${theme.primary}; --secondary: ${theme.secondary}; --accent: ${theme.accent};"></div>
+          <h4 class="font-semibold mb-2">${theme.name}</h4>
+          <div class="palette mb-4">
+            ${[theme.primary, theme.secondary, theme.accent, theme.bg, theme.text].map(color => 
+              `<div class="color-pill" style="background: ${color}" onclick="copyColor('${color}')"></div>`
+            ).join('')}
+          </div>
+          <div class="flex justify-between">
+            <button onclick="applyTheme(${index})" class="px-3 py-1 bg-sky-500 rounded text-sm hover:bg-sky-600">Apply</button>
+            <button onclick="deleteTheme(${index})" class="px-3 py-1 bg-red-500 rounded text-sm hover:bg-red-600">Delete</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Generate random palettes
+    function generatePalettes() {
+      const container = document.getElementById('paletteContainer');
+      const palettes = Array.from({length: 8}, generateRandomPalette);
+      
+      container.innerHTML = palettes.map(palette => `
+        <div class="glass rounded-lg p-4 cursor-pointer hover:scale-105 transition-transform" onclick="usePalette(${JSON.stringify(palette).replace(/"/g, '&quot;')})">
+          <div class="flex gap-1 mb-2">
+            ${palette.colors.map(color => 
+              `<div class="flex-1 h-8 rounded" style="background: ${color}"></div>`
+            ).join('')}
+          </div>
+          <p class="text-sm opacity-80">${palette.name}</p>
+        </div>
+      `).join('');
+    }
+
+    // Setup slider
+    function setupSlider() {
+      const track = document.getElementById('sliderTrack');
+      const themes = ['Ocean', 'Sunset', 'Forest', 'Neon', 'Pastel'];
+      
+      track.innerHTML = themes.map(name => `
+        <div class="slider-item" style="background: linear-gradient(135deg, ${generateRandomColor()}, ${generateRandomColor()}, ${generateRandomColor()})">
+          ${name} Theme
+        </div>
+      `).join('');
+      
+      setInterval(() => {
+        track.style.transform = `translateX(-${(Date.now() / 3000) % themes.length * 100}%)`;
+      }, 3000);
+    }
+
+    // Create particles
+    function createParticles() {
+      const particleCount = 50;
+      const container = document.body;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + 'vw';
+        particle.style.top = Math.random() * 100 + 'vh';
+        particle.style.animationDelay = Math.random() * 5 + 's';
+        particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        container.appendChild(particle);
+        
+        animateParticle(particle);
+      }
+    }
+
+    // Animate particle
+    function animateParticle(particle) {
+      const duration = Math.random() * 3000 + 2000;
+      const startX = parseFloat(particle.style.left);
+      const startY = parseFloat(particle.style.top);
+      const endX = startX + (Math.random() - 0.5) * 20;
+      const endY = startY + (Math.random() - 0.5) * 20;
+      
+      gsap.to(particle, {
+        left: endX + 'vw',
+        top: endY + 'vh',
+        opacity: Math.random(),
+        duration: duration / 1000,
+        onComplete: () => animateParticle(particle)
+      });
+    }
+
+    // Theme form setup
+    function setupThemeForm() {
+      document.getElementById('themeForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const theme = {
+          name: document.getElementById('themeName').value,
+          primary: document.getElementById('primary').value,
+          secondary: document.getElementById('secondary').value,
+          accent: document.getElementById('accent').value,
+          bg: document.getElementById('bg').value,
+          text: document.getElementById('text').value,
+          card: document.getElementById('card').value
+        };
+        
+        themes.push(theme);
+        localStorage.setItem('themes', JSON.stringify(themes));
+        renderThemes();
+        closeModal();
+        e.target.reset();
+      });
+    }
+
+    // Apply theme
+    function applyTheme(index) {
+      const theme = themes[index];
+      document.documentElement.style.setProperty('--primary', theme.primary);
+      document.documentElement.style.setProperty('--secondary', theme.secondary);
+      document.documentElement.style.setProperty('--accent', theme.accent);
+      document.documentElement.style.setProperty('--bg', theme.bg);
+      document.documentElement.style.setProperty('--text', theme.text);
+      document.documentElement.style.setProperty('--card', theme.card);
+      
+      currentTheme = theme;
+      document.body.style.background = theme.bg;
+      document.body.style.color = theme.text;
+    }
+
+    // Delete theme
+    function deleteTheme(index) {
+      themes.splice(index, 1);
+      localStorage.setItem('themes', JSON.stringify(themes));
+      renderThemes();
+    }
+
+    // Generate random theme
+    function randomTheme() {
+      const theme = {
+        name: `Theme ${Date.now()}`,
+        primary: generateRandomColor(),
+        secondary: generateRandomColor(),
+        accent: generateRandomColor(),
+        bg: generateRandomColor(),
+        text: generateRandomColor(),
+        card: generateRandomColor()
+      };
+      
+      themes.push(theme);
+      localStorage.setItem('themes', JSON.stringify(themes));
+      renderThemes();
+    }
+
+    // Export themes
+    function exportThemes() {
+      const blob = new Blob([JSON.stringify(themes, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'themes.json';
+      a.click();
+    }
+
+    // Copy color
+    function copyColor(color) {
+      navigator.clipboard.writeText(color);
+    }
+
+    // Use palette
+    function usePalette(palette) {
+      document.getElementById('primary').value = palette.colors[0];
+      document.getElementById('secondary').value = palette.colors[1];
+      document.getElementById('accent').value = palette.colors[2];
+    }
+
+    // Modal functions
+    function openModal() {
+      document.getElementById('themeModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('themeModal').classList.add('hidden');
+    }
+
+    // Scroll to top
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Utility functions
+    function generateRandomColor() {
+      return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+    }
+
+    function generateRandomPalette() {
+      const names = ['Ocean', 'Sunset', 'Forest', 'Neon', 'Pastel', 'Dark', 'Light', 'Vibrant'];
+      return {
+        name: names[Math.floor(Math.random() * names.length)],
+        colors: Array.from({length: 5}, generateRandomColor)
+      };
+    }
+
+    // Close modal on outside click
+    document.getElementById('themeModal').addEventListener('click', (e) => {
+      if (e.target.id === 'themeModal') {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
